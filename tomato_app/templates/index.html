@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Deteksi Penyakit Daun Tomat - AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              tomato: "#ff6347",
+              "leaf-green": "#228b22",
+              earth: "#8b4513",
+            },
+            animation: {
+              float: "float 6s ease-in-out infinite",
+              "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              "bounce-slow": "bounce 3s infinite",
+              wiggle: "wiggle 1s ease-in-out infinite",
+              "slide-up": "slideUp 0.8s ease-out",
+              "fade-in": "fadeIn 0.6s ease-out",
+              "scale-in": "scaleIn 0.5s ease-out",
+            },
+            keyframes: {
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-20px)" },
+              },
+              wiggle: {
+                "0%, 100%": { transform: "rotate(-3deg)" },
+                "50%": { transform: "rotate(3deg)" },
+              },
+              slideUp: {
+                "0%": { transform: "translateY(100px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              scaleIn: {
+                "0%": { transform: "scale(0.9)", opacity: "0" },
+                "100%": { transform: "scale(1)", opacity: "1" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .gradient-text {
+        background: linear-gradient(135deg, #22c55e, #16a34a, #15803d);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .glass-effect {
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        background-color: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(209, 213, 219, 0.3);
+      }
+
+      .hover-lift {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .hover-lift:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+    </style>
+  </head>
+  <body class="bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 min-h-screen">
+    <!-- Animated Background Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+      <div class="absolute top-10 left-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-float"></div>
+      <div class="absolute top-40 right-20 w-24 h-24 bg-blue-200 rounded-full opacity-20 animate-bounce-slow"></div>
+      <div class="absolute bottom-20 left-20 w-28 h-28 bg-emerald-200 rounded-full opacity-20 animate-pulse-slow"></div>
+      <div class="absolute bottom-40 right-10 w-20 h-20 bg-teal-200 rounded-full opacity-20 animate-float"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-effect backdrop-blur-md bg-white/80 shadow-2xl border-b border-white/20 animate-slide-up">
+      <div class="container mx-auto px-6 py-6">
+        <div class="flex items-center justify-center animate-fade-in">
+          <i class="fas fa-leaf text-leaf-green text-4xl mr-4 animate-wiggle"></i>
+          <div class="text-center">
+            <h1 class="text-4xl font-bold gradient-text">Deteksi Penyakit Daun Tomat</h1>
+            <div class="w-24 h-1 bg-gradient-to-r from-green-400 to-blue-500 mx-auto mt-2 rounded-full"></div>
+          </div>
+        </div>
+        <p class="text-center text-gray-700 mt-4 text-lg animate-fade-in">
+          <i class="fas fa-robot mr-2 text-blue-600"></i>
+          Sistem AI untuk deteksi dini penyakit pada tanaman tomat
+          <button id="infoBtn" class="ml-3 bg-blue-100 hover:bg-blue-200 text-blue-600 px-3 py-1 rounded-full text-sm transition-colors">
+            <i class="fas fa-question-circle mr-1"></i>
+            Info
+          </button>
+        </p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+      <!-- Upload Section -->
+      <div class="max-w-5xl mx-auto animate-scale-in">
+        <div class="glass-effect rounded-3xl shadow-2xl overflow-hidden hover-lift border border-white/30">
+          <div class="bg-gradient-to-r from-emerald-500 via-green-500 to-teal-500 p-8 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+            <h2 class="text-3xl font-bold text-white text-center relative z-10 animate-fade-in">
+              <i class="fas fa-camera mr-3 animate-pulse"></i>
+              Upload Gambar Daun Tomat
+            </h2>
+            <p class="text-green-100 text-center mt-3 text-lg relative z-10 animate-fade-in">Pilih gambar daun tomat untuk dianalisis dengan teknologi AI</p>
+          </div>
+
+          <div class="p-10">
+            <!-- Upload Form -->
+            <form id="uploadForm" enctype="multipart/form-data" class="space-y-8">
+              <div class="flex items-center justify-center w-full">
+                <label
+                  for="imageInput"
+                  class="flex flex-col items-center justify-center w-full h-80 border-3 border-gray-300 border-dashed rounded-2xl cursor-pointer bg-gradient-to-br from-gray-50 to-gray-100 hover:from-green-50 hover:to-blue-50 transition-all duration-500 transform hover:scale-[1.02] hover:border-green-400 group"
+                >
+                  <div class="flex flex-col items-center justify-center pt-5 pb-6" id="uploadArea">
+                    <div class="relative">
+                      <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-6 group-hover:text-green-500 transition-colors duration-300 animate-bounce-slow"></i>
+                      <div class="absolute -top-2 -right-2 w-4 h-4 bg-green-400 rounded-full animate-ping"></div>
+                    </div>
+                    <p class="mb-3 text-lg text-gray-600 group-hover:text-gray-800 transition-colors"><span class="font-bold">Klik untuk upload</span> atau drag & drop gambar</p>
+                    <p class="text-sm text-gray-500 bg-white px-4 py-2 rounded-full shadow-md"><i class="fas fa-file-image mr-2"></i>PNG, JPG, JPEG (MAX. 16MB)</p>
+                  </div>
+                  <input id="imageInput" type="file" name="image" class="hidden" accept="image/*" required />
+                </label>
+              </div>
+
+              <!-- Preview Image -->
+              <div id="imagePreview" class="hidden animate-scale-in">
+                <div class="relative">
+                  <img id="previewImg" class="mx-auto max-h-80 rounded-2xl shadow-2xl border-4 border-white" />
+                  <div class="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-2 shadow-lg animate-pulse">
+                    <i class="fas fa-check text-sm"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="text-center">
+                <button
+                  type="submit"
+                  id="submitBtn"
+                  class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-2xl hover:shadow-emerald-500/25 animate-pulse-slow"
+                >
+                  <i class="fas fa-magic mr-3"></i>
+                  Analisis dengan AI
+                  <i class="fas fa-arrow-right ml-3"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Animation -->
+      <div id="loadingDiv" class="hidden max-w-4xl mx-auto mt-12 animate-fade-in">
+        <div class="glass-effect rounded-3xl shadow-2xl p-12 text-center border border-white/30">
+          <div class="relative">
+            <div class="animate-spin rounded-full h-24 w-24 border-8 border-emerald-200 border-t-emerald-500 mx-auto mb-6"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <i class="fas fa-leaf text-2xl text-emerald-500 animate-pulse"></i>
+            </div>
+          </div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">Menganalisis Gambar...</h3>
+          <p class="text-gray-600 text-lg">AI sedang memproses gambar Anda</p>
+          <div class="mt-6 flex justify-center space-x-2">
+            <div class="w-3 h-3 bg-emerald-500 rounded-full animate-bounce"></div>
+            <div class="w-3 h-3 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+            <div class="w-3 h-3 bg-emerald-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div id="resultsDiv" class="hidden max-w-6xl mx-auto mt-12">
+        <div class="grid md:grid-cols-2 gap-8 animate-fade-in">
+          <!-- Image and Main Result -->
+          <div class="glass-effect rounded-3xl shadow-2xl overflow-hidden hover-lift border border-white/30">
+            <div class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 p-6 relative overflow-hidden">
+              <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -mr-10 -mt-10"></div>
+              <h3 class="text-2xl font-bold text-white relative z-10">
+                <i class="fas fa-image mr-3 animate-pulse"></i>
+                Gambar & Hasil Utama
+              </h3>
+            </div>
+            <div class="p-8">
+              <div class="relative group">
+                <img id="resultImage" class="w-full rounded-2xl shadow-2xl mb-6 transform transition-transform duration-300 group-hover:scale-105" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <div id="mainResult" class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 shadow-inner">
+                <!-- Main result will be populated here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Detailed Analysis -->
+          <div class="glass-effect rounded-3xl shadow-2xl overflow-hidden hover-lift border border-white/30">
+            <div class="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 p-6 relative overflow-hidden">
+              <div class="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full -ml-8 -mb-8"></div>
+              <h3 class="text-2xl font-bold text-white relative z-10">
+                <i class="fas fa-chart-bar mr-3 animate-bounce-slow"></i>
+                Analisis Detail
+              </h3>
+            </div>
+            <div class="p-8">
+              <!-- Top 3 Predictions -->
+              <div class="mb-8">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-trophy mr-2 text-yellow-500"></i>
+                  Top 3 Prediksi:
+                </h4>
+                <div id="top3Results" class="space-y-3">
+                  <!-- Top 3 results will be populated here -->
+                </div>
+              </div>
+
+              <!-- Confidence Meter -->
+              <div class="mb-8">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-gauge-high mr-2 text-green-500"></i>
+                  Tingkat Kepercayaan:
+                </h4>
+                <div class="bg-gray-200 rounded-full h-6 relative overflow-hidden">
+                  <div id="confidenceBar" class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 h-6 rounded-full transition-all duration-1000 relative" style="width: 0%">
+                    <div class="absolute inset-0 bg-white/30 animate-pulse"></div>
+                  </div>
+                </div>
+                <p id="confidenceText" class="text-lg font-bold text-gray-700 mt-2 text-center">0%</p>
+              </div>
+
+              <!-- Debug Info for Non-Tomato Detection -->
+              <div id="debugInfo" class="hidden mb-8">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-bug mr-2 text-purple-500"></i>
+                  Informasi Analisis:
+                </h4>
+                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div id="debugContent" class="text-sm text-gray-600 space-y-2">
+                    <!-- Debug content will be populated here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disease Information -->
+        <div id="diseaseInfo" class="glass-effect rounded-3xl shadow-2xl overflow-hidden mt-12 hover-lift border border-white/30 animate-slide-up">
+          <div class="bg-gradient-to-r from-red-500 via-orange-500 to-yellow-500 p-6 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -ml-20 -mt-20"></div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mb-16"></div>
+            <h3 class="text-2xl font-bold text-white text-center relative z-10">
+              <i class="fas fa-info-circle mr-3 animate-wiggle"></i>
+              Informasi Lengkap Penyakit dan Rekomendasi
+            </h3>
+          </div>
+
+          <!-- Warning Banner for Non-Tomato Images -->
+          <div id="nonTomatoWarning" class="hidden bg-gradient-to-r from-red-600 via-red-500 to-red-600 border-l-8 border-red-800 p-6 m-6 rounded-xl shadow-2xl animate-pulse">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-4xl text-yellow-300 animate-bounce mr-4"></i>
+              </div>
+              <div class="ml-3 flex-1">
+                <h4 class="text-2xl font-bold text-white mb-2">⚠️ PERINGATAN SISTEM DETEKSI ⚠️</h4>
+                <p id="warningMessage" class="text-red-100 text-lg font-semibold mb-3"></p>
+                <div class="bg-red-800/30 rounded-lg p-4 mt-3">
+                  <p class="text-red-100 text-sm">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Rekomendasi:</strong> Pastikan gambar yang diupload adalah foto daun tomat yang jelas, dengan pencahayaan yang baik, dan fokus pada daun tanpa background yang mengganggu.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alternative content for non-tomato images -->
+          <div id="nonTomatoAnalysis" class="hidden p-8">
+            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-8 border-l-4 border-red-500">
+              <div class="text-center mb-6">
+                <i class="fas fa-times-circle text-6xl text-red-500 mb-4"></i>
+                <h3 class="text-2xl font-bold text-red-800 mb-2">Gambar Tidak Valid</h3>
+                <p class="text-red-700 text-lg">Sistem tidak dapat menganalisis gambar ini sebagai daun tomat</p>
+              </div>
+
+              <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg p-6 shadow-md">
+                  <h4 class="font-bold text-red-800 mb-4 flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-3 text-red-600"></i>
+                    Kemungkinan Penyebab:
+                  </h4>
+                  <ul id="nonTomatoReasons" class="space-y-2 text-red-700">
+                    <!-- Non-tomato reasons will be populated here -->
+                  </ul>
+                </div>
+
+                <div class="bg-white rounded-lg p-6 shadow-md">
+                  <h4 class="font-bold text-green-800 mb-4 flex items-center">
+                    <i class="fas fa-lightbulb mr-3 text-green-600"></i>
+                    Saran Perbaikan:
+                  </h4>
+                  <ul class="space-y-2 text-green-700">
+                    <li class="flex items-start">
+                      <i class="fas fa-camera mr-2 mt-1 text-green-500 flex-shrink-0"></i>
+                      Pastikan foto menampilkan daun tomat yang jelas
+                    </li>
+                    <li class="flex items-start">
+                      <i class="fas fa-sun mr-2 mt-1 text-yellow-500 flex-shrink-0"></i>
+                      Gunakan pencahayaan yang cukup terang
+                    </li>
+                    <li class="flex items-start">
+                      <i class="fas fa-focus mr-2 mt-1 text-blue-500 flex-shrink-0"></i>
+                      Fokus pada satu daun tomat saja
+                    </li>
+                    <li class="flex items-start">
+                      <i class="fas fa-crop mr-2 mt-1 text-purple-500 flex-shrink-0"></i>
+                      Hindari background yang mengganggu
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="mt-6 bg-yellow-100 rounded-lg p-4 border border-yellow-300">
+                <div class="flex items-center mb-2">
+                  <i class="fas fa-info-circle text-yellow-600 text-xl mr-3"></i>
+                  <h5 class="font-bold text-yellow-800">Tips Upload Ulang:</h5>
+                </div>
+                <p class="text-yellow-700">Silakan upload gambar baru yang menampilkan daun tomat dengan jelas. Sistem ini dirancang khusus untuk mendeteksi penyakit pada daun tomat dan tidak dapat menganalisis gambar lainnya.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Disease Analysis Section - Hidden for non-tomato images -->
+          <div id="diseaseAnalysisSection" class="p-8">
+            <!-- Disease Overview -->
+            <div class="grid md:grid-cols-1 gap-8 mb-8">
+              <div class="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 border-l-4 border-blue-500">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-xl">
+                  <i class="fas fa-microscope mr-3 text-blue-600"></i>
+                  Deskripsi Penyakit
+                </h4>
+                <div id="diseaseDescription" class="text-gray-700 leading-relaxed text-lg">
+                  <!-- Disease description will be populated here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Symptoms and Causes -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+              <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-6 border-l-4 border-red-500 transform transition-transform duration-300 hover:scale-105">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-exclamation-triangle mr-3 text-red-500"></i>
+                  Gejala & Tanda-tanda
+                </h4>
+                <div id="diseaseSymptoms" class="space-y-3">
+                  <!-- Disease symptoms will be populated here -->
+                </div>
+              </div>
+              <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-6 border-l-4 border-orange-500 transform transition-transform duration-300 hover:scale-105">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-search mr-3 text-orange-500"></i>
+                  Penyebab & Kondisi Pemicu
+                </h4>
+                <div id="diseaseCauses" class="space-y-3">
+                  <!-- Disease causes will be populated here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Prevention and Treatment -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+              <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 border-l-4 border-green-500 transform transition-transform duration-300 hover:scale-105">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-shield-alt mr-3 text-green-500"></i>
+                  Pencegahan
+                </h4>
+                <div id="diseasePrevention" class="space-y-3">
+                  <!-- Disease prevention will be populated here -->
+                </div>
+              </div>
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border-l-4 border-blue-500 transform transition-transform duration-300 hover:scale-105">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-medical-kit mr-3 text-blue-500"></i>
+                  Pengobatan & Pengendalian
+                </h4>
+                <div id="diseaseTreatment" class="space-y-3">
+                  <!-- Disease treatment will be populated here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Impact and Schedule -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+              <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border-l-4 border-purple-500 transform transition-transform duration-300 hover:scale-105">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-chart-line mr-3 text-purple-500"></i>
+                  Dampak & Kerugian
+                </h4>
+                <div id="diseaseImpact" class="space-y-3">
+                  <!-- Disease impact will be populated here -->
+                </div>
+              </div>
+              <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-2xl p-6 border-l-4 border-teal-500 transform transition-transform duration-300 hover:scale-105">
+                <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                  <i class="fas fa-calendar-alt mr-3 text-teal-500"></i>
+                  Jadwal Pengendalian
+                </h4>
+                <div id="diseaseSchedule" class="space-y-3">
+                  <!-- Disease schedule will be populated here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Special Conditions (for healthy plants) -->
+            <div id="healthyConditions" class="hidden">
+              <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border-l-4 border-emerald-500">
+                  <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                    <i class="fas fa-leaf mr-3 text-emerald-500"></i>
+                    Perawatan Optimal
+                  </h4>
+                  <div id="healthyMaintenance" class="space-y-3">
+                    <!-- Healthy maintenance will be populated here -->
+                  </div>
+                </div>
+                <div class="bg-gradient-to-br from-sky-50 to-sky-100 rounded-2xl p-6 border-l-4 border-sky-500">
+                  <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                    <i class="fas fa-thermometer-half mr-3 text-sky-500"></i>
+                    Kondisi Optimal
+                  </h4>
+                  <div id="healthyConditionsDetail" class="space-y-3">
+                    <!-- Healthy conditions will be populated here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Tips -->
+            <div class="mt-8 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-6 border border-yellow-200">
+              <h4 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
+                <i class="fas fa-lightbulb mr-3 text-yellow-600"></i>
+                Tips & Rekomendasi Tindakan
+              </h4>
+              <div id="actionTips" class="bg-white rounded-lg p-4 shadow-md">
+                <!-- Action tips will be populated here -->
+              </div>
+            </div>
+          </div>
+          <!-- End Disease Analysis Section -->
+        </div>
+
+        <!-- Download Report -->
+        <div id="downloadSection" class="text-center mt-12 animate-fade-in">
+          <button
+            id="downloadBtn"
+            class="bg-gradient-to-r from-tomato via-red-500 to-pink-600 hover:from-red-600 hover:via-pink-600 hover:to-purple-700 text-white font-bold py-4 px-12 rounded-full text-lg transition-all duration-500 transform hover:scale-110 shadow-2xl hover:shadow-red-500/25 relative overflow-hidden group"
+          >
+            <div class="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+            <span class="relative z-10">
+              <i class="fas fa-download mr-3"></i>
+              Download Laporan PDF
+              <i class="fas fa-file-pdf ml-3"></i>
+            </span>
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-2xl">
+          <div class="flex items-center justify-between">
+            <h3 class="text-2xl font-bold">
+              <i class="fas fa-info-circle mr-2"></i>
+              Cara Menggunakan Sistem
+            </h3>
+            <button id="closeModal" class="text-white hover:text-gray-200 text-2xl">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="space-y-6">
+            <!-- What this system can do -->
+            <div>
+              <h4 class="font-bold text-lg text-green-600 mb-3 flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                Apa yang Bisa Dilakukan Sistem Ini:
+              </h4>
+              <ul class="space-y-2 text-gray-700">
+                <li class="flex items-start">
+                  <i class="fas fa-leaf text-green-500 mr-2 mt-1 flex-shrink-0"></i>
+                  <span>Mendeteksi 9 jenis penyakit pada daun tomat dan kondisi sehat</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-percentage text-blue-500 mr-2 mt-1 flex-shrink-0"></i>
+                  <span>Memberikan tingkat kepercayaan prediksi</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-info text-purple-500 mr-2 mt-1 flex-shrink-0"></i>
+                  <span>Memberikan informasi lengkap tentang penyakit dan cara mengatasinya</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-file-pdf text-red-500 mr-2 mt-1 flex-shrink-0"></i>
+                  <span>Menghasilkan laporan PDF yang dapat diunduh</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Limitations -->
+            <div>
+              <h4 class="font-bold text-lg text-orange-600 mb-3 flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Keterbatasan Sistem:
+              </h4>
+              <ul class="space-y-2 text-gray-700">
+                <li class="flex items-start">
+                  <i class="fas fa-times text-red-500 mr-2 mt-1 flex-shrink-0"></i>
+                  <span>Hanya untuk daun tomat, tidak bisa mendeteksi daun tanaman lain</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-eye text-orange-500 mr-2 mt-1 flex-shrink-0"></i>
+                  <span>Memerlukan gambar yang jelas dengan pencahayaan yang baik</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-user-md text-blue-500 mr-2 mt-1 flex-shrink-0"></i>
+                  <span>Hasil harus dikonfirmasi oleh ahli pertanian untuk diagnosis final</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Best practices -->
+            <div>
+              <h4 class="font-bold text-lg text-blue-600 mb-3 flex items-center">
+                <i class="fas fa-lightbulb mr-2"></i>
+                Tips untuk Hasil Terbaik:
+              </h4>
+              <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-green-50 rounded-lg p-4">
+                  <h5 class="font-semibold text-green-800 mb-2">✅ Yang Benar:</h5>
+                  <ul class="space-y-1 text-sm text-green-700">
+                    <li>• Gunakan foto daun tomat yang jelas</li>
+                    <li>• Pencahayaan alami atau lampu yang cukup</li>
+                    <li>• Fokus pada satu daun</li>
+                    <li>• Background yang tidak mengganggu</li>
+                    <li>• Resolusi gambar yang baik</li>
+                  </ul>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                  <h5 class="font-semibold text-red-800 mb-2">❌ Yang Salah:</h5>
+                  <ul class="space-y-1 text-sm text-red-700">
+                    <li>• Gambar blur atau tidak fokus</li>
+                    <li>• Terlalu gelap atau terlalu terang</li>
+                    <li>• Banyak daun dalam satu foto</li>
+                    <li>• Ada tangan atau objek lain</li>
+                    <li>• Bukan daun tomat</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confidence interpretation -->
+            <div>
+              <h4 class="font-bold text-lg text-purple-600 mb-3 flex items-center">
+                <i class="fas fa-gauge-high mr-2"></i>
+                Cara Membaca Tingkat Kepercayaan:
+              </h4>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-green-500 rounded mr-3"></div>
+                  <span class="text-gray-700"><strong>70-100%:</strong> Sangat yakin - Hasil dapat diandalkan</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-yellow-500 rounded mr-3"></div>
+                  <span class="text-gray-700"><strong>50-69%:</strong> Cukup yakin - Perlu verifikasi tambahan</span>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-4 h-4 bg-red-500 rounded mr-3"></div>
+                  <span class="text-gray-700"><strong>0-49%:</strong> Tidak yakin - Kemungkinan bukan daun tomat</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact info -->
+            <div class="bg-blue-50 rounded-lg p-4">
+              <h4 class="font-bold text-blue-800 mb-2">
+                <i class="fas fa-phone mr-2"></i>
+                Perlu Bantuan Lebih Lanjut?
+              </h4>
+              <p class="text-blue-700 text-sm">Untuk diagnosis yang akurat dan rekomendasi pengobatan yang tepat, konsultasikan hasil ini dengan penyuluh pertanian atau ahli tanaman di daerah Anda.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white py-12 mt-20 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-green-900/20 to-blue-900/20"></div>
+      <div class="container mx-auto px-6 text-center relative z-10">
+        <div class="mb-6">
+          <i class="fas fa-leaf text-3xl text-green-400 animate-wiggle"></i>
+        </div>
+        <p class="text-xl mb-2">&copy; 2025 Sistem Deteksi Penyakit Daun Tomat. Powered by AI.</p>
+        <p class="text-gray-400 text-lg">Untuk hasil yang akurat, konsultasikan dengan ahli pertanian.</p>
+        <div class="mt-6 flex justify-center space-x-6">
+          <i class="fab fa-github text-2xl text-gray-400 hover:text-white transition-colors cursor-pointer"></i>
+          <i class="fab fa-linkedin text-2xl text-gray-400 hover:text-white transition-colors cursor-pointer"></i>
+          <i class="fas fa-envelope text-2xl text-gray-400 hover:text-white transition-colors cursor-pointer"></i>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      let currentFilename = null;
+
+      // Add animation classes when page loads
+      window.addEventListener("load", function () {
+        document.body.classList.add("animate-fade-in");
+      });
+
+      // Info modal functionality
+      document.getElementById("infoBtn").addEventListener("click", function () {
+        document.getElementById("infoModal").classList.remove("hidden");
+      });
+
+      document.getElementById("closeModal").addEventListener("click", function () {
+        document.getElementById("infoModal").classList.add("hidden");
+      });
+
+      // Close modal when clicking outside
+      document.getElementById("infoModal").addEventListener("click", function (e) {
+        if (e.target === this) {
+          this.classList.add("hidden");
+        }
+      });
+
+      // Handle file input change
+      document.getElementById("imageInput").addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            document.getElementById("previewImg").src = e.target.result;
+            document.getElementById("imagePreview").classList.remove("hidden");
+            // Add animation class
+            document.getElementById("imagePreview").classList.add("animate-scale-in");
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Handle form submission
+      document.getElementById("uploadForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const formData = new FormData();
+        const imageFile = document.getElementById("imageInput").files[0];
+
+        if (!imageFile) {
+          showNotification("Silakan pilih gambar terlebih dahulu!", "error");
+          return;
+        }
+
+        formData.append("image", imageFile);
+
+        // Show loading with animation
+        document.getElementById("loadingDiv").classList.remove("hidden");
+        document.getElementById("resultsDiv").classList.add("hidden");
+        document.getElementById("submitBtn").disabled = true;
+
+        // Add loading animation to button
+        document.getElementById("submitBtn").innerHTML = `
+          <i class="fas fa-spinner animate-spin mr-3"></i>
+          Memproses...
+        `;
+
+        fetch("/", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              throw new Error(data.error);
+            }
+            displayResults(data);
+            showNotification("Analisis berhasil!", "success");
+          })
+          .catch((error) => {
+            showNotification("Error: " + error.message, "error");
+          })
+          .finally(() => {
+            document.getElementById("loadingDiv").classList.add("hidden");
+            document.getElementById("submitBtn").disabled = false;
+            document.getElementById("submitBtn").innerHTML = `
+              <i class="fas fa-magic mr-3"></i>
+              Analisis dengan AI
+              <i class="fas fa-arrow-right ml-3"></i>
+            `;
+          });
+      });
+
+      function displayResults(data) {
+        currentFilename = data.filename;
+
+        // Display image
+        document.getElementById("resultImage").src = data.image_path;
+
+        // Check if this is likely a tomato leaf and show/hide sections
+        const isLikelyTomato = data.is_likely_tomato;
+        const warningMessage = data.warning_message;
+
+        // Control visibility of disease analysis section
+        if (!isLikelyTomato) {
+          // Show warning and hide disease analysis
+          document.getElementById("nonTomatoWarning").classList.remove("hidden");
+          document.getElementById("warningMessage").textContent = warningMessage || "Gambar ini kemungkinan bukan daun tomat.";
+          document.getElementById("diseaseAnalysisSection").classList.add("hidden");
+          document.getElementById("downloadSection").classList.add("hidden");
+
+          // Show only basic invalid result
+          document.getElementById("mainResult").innerHTML = `
+            <div class="text-center">
+              <div class="mb-4">
+                <i class="fas fa-times-circle text-6xl text-red-600 mb-4"></i>
+                <h4 class="text-2xl font-bold text-red-800 mb-2">GAMBAR TIDAK VALID</h4>
+                <p class="text-red-700 text-lg mb-4">Sistem tidak dapat menganalisis gambar ini sebagai daun tomat</p>
+              </div>
+              <div class="bg-red-50 rounded-xl p-6 border-2 border-red-200">
+                <p class="text-red-800 font-semibold mb-3">Kemungkinan Penyebab:</p>
+                <ul class="text-left text-red-700 space-y-2">
+                  <li>• Gambar bukan daun tomat</li>
+                  <li>• Kualitas gambar kurang baik</li>
+                  <li>• Pencahayaan tidak optimal</li>
+                  <li>• Objek lain dalam gambar</li>
+                </ul>
+                <div class="mt-4 bg-red-100 rounded-lg p-3">
+                  <p class="text-red-800 text-sm font-semibold">
+                    <i class="fas fa-lightbulb mr-2"></i>
+                    Silakan upload gambar daun tomat yang jelas dengan pencahayaan yang baik
+                  </p>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Clear other sections
+          document.getElementById("top3Results").innerHTML = `
+            <div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 text-center">
+              <i class="fas fa-ban text-red-500 text-3xl mb-3"></i>
+              <h5 class="font-bold text-red-800 mb-2">Analisis Tidak Tersedia</h5>
+              <p class="text-red-700">Prediksi penyakit hanya tersedia untuk gambar daun tomat yang valid.</p>
+            </div>
+          `;
+
+          document.getElementById("confidenceBar").style.width = "0%";
+          document.getElementById("confidenceText").textContent = "0%";
+
+        } else {
+          // Hide warning and show normal analysis
+          document.getElementById("nonTomatoWarning").classList.add("hidden");
+          document.getElementById("diseaseAnalysisSection").classList.remove("hidden");
+          document.getElementById("downloadSection").classList.remove("hidden");
+
+          // Process normal tomato leaf analysis
+          const prediction = data.prediction.replace("Tomato___", "").replace(/_/g, " ");
+          const severity = data.disease_info.severity || "Tidak diketahui";
+          const severityColor = getSeverityColor(severity);
+          const severityIcon = getSeverityIcon(severity);
+
+          // Add warning banner if there's a warning message (for tomato leaves)
+          let warningBanner = "";
+          if (warningMessage) {
+            warningBanner = `
+              <div class="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6 rounded-lg">
+                <div class="flex items-center">
+                  <i class="fas fa-exclamation-circle text-yellow-500 text-xl mr-3"></i>
+                  <div>
+                    <h5 class="font-bold text-yellow-800">⚠️ Perhatian</h5>
+                    <p class="text-yellow-700 mt-1">${warningMessage}</p>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+
+          document.getElementById("mainResult").innerHTML = `
+            ${warningBanner}
+            <div class="text-center">
+              <div class="mb-4">
+                <i class="fas fa-microscope text-4xl text-blue-600 mb-2"></i>
+                <h4 class="text-2xl font-bold text-gray-800 mb-2">Diagnosis:</h4>
+              </div>
+              <div class="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                <p class="text-3xl font-bold text-${severityColor}-600 mb-4">${prediction}</p>
+                <div class="flex items-center justify-center space-x-4 flex-wrap gap-2">
+                  <span class="bg-${severityColor}-100 text-${severityColor}-800 px-4 py-2 rounded-full text-sm font-bold flex items-center">
+                    <i class="fas fa-${severityIcon} mr-2"></i>
+                    ${severity}
+                  </span>
+                  <span class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-semibold flex items-center">
+                    <i class="fas fa-clock mr-2"></i>
+                    ${data.timestamp}
+                  </span>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Top 3 predictions for valid tomato leaves
+          const top3Html = data.top_3
+            .map((item, index) => {
+              const diseaseName = item[0].replace("Tomato___", "").replace(/_/g, " ");
+              const percentage = item[1].toFixed(1);
+              const medal = index === 0 ? "gold" : index === 1 ? "silver" : "bronze";
+              const medalColor = index === 0 ? "yellow" : index === 1 ? "gray" : "amber";
+
+              return `
+                <div class="flex items-center justify-between bg-white rounded-xl p-4 shadow-md border border-gray-200 transform transition-transform duration-300 hover:scale-105">
+                  <div class="flex items-center">
+                    <div class="w-8 h-8 bg-${medalColor}-100 text-${medalColor}-600 rounded-full flex items-center justify-center font-bold mr-3">
+                      ${index + 1}
+                    </div>
+                    <span class="font-semibold text-gray-800">${diseaseName}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-16 h-2 bg-gray-200 rounded-full mr-3">
+                      <div class="h-2 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full transition-all duration-1000" style="width: ${percentage}%"></div>
+                    </div>
+                    <span class="font-bold text-purple-600 text-lg">${percentage}%</span>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+          document.getElementById("top3Results").innerHTML = top3Html;
+
+          // Confidence bar with animation for valid tomato leaves
+          const confidence = Math.round(data.confidence);
+          setTimeout(() => {
+            document.getElementById("confidenceBar").style.width = confidence + "%";
+          }, 500);
+          document.getElementById("confidenceText").textContent = confidence + "%";
+        } // End of valid tomato analysis
+
+        // Show debug info if available (for both valid and invalid)
+        if (data.debug_info && data.debug_info.non_tomato_score > 10) {
+        if (data.debug_info && data.debug_info.non_tomato_score > 20) {
+          document.getElementById("debugInfo").classList.remove("hidden");
+          const debugInfo = data.debug_info;
+          let debugHtml = `
+            <div class="grid grid-cols-2 gap-4 mb-3">
+              <div>
+                <span class="font-semibold">Skor Non-Tomat:</span>
+                <span class="font-mono ${debugInfo.non_tomato_score > 40 ? "text-red-600" : debugInfo.non_tomato_score > 25 ? "text-yellow-600" : "text-green-600"}">${debugInfo.non_tomato_score}/100</span>
+              </div>
+              <div>
+                <span class="font-semibold">Entropy:</span>
+                <span class="font-mono ${debugInfo.entropy > 2.1 ? "text-red-600" : debugInfo.entropy > 1.8 ? "text-yellow-600" : "text-green-600"}">${debugInfo.entropy.toFixed(3)}</span>
+              </div>
+            </div>
+          `;
+
+          if (debugInfo.non_tomato_reasons && debugInfo.non_tomato_reasons.length > 0) {
+            debugHtml += `
+              <div class="mb-3">
+                <span class="font-semibold">Alasan Deteksi:</span>
+                <ul class="list-disc list-inside mt-1 text-red-600">
+                  ${debugInfo.non_tomato_reasons
+                    .slice(0, 3)
+                    .map((reason) => `<li>${reason}</li>`)
+                    .join("")}
+                </ul>
+              </div>
+            `;
+          }
+
+          document.getElementById("debugContent").innerHTML = debugHtml;
+        } else {
+          document.getElementById("debugInfo").classList.add("hidden");
+        }
+
+        // Process disease information only for valid tomato leaves
+        if (isLikelyTomato) {
+          // Disease information with enhanced styling
+          const info = data.disease_info;
+
+        // Description
+        document.getElementById("diseaseDescription").innerHTML = `
+          <p class="text-gray-700 leading-relaxed">${info.description || "Tidak tersedia"}</p>
+        `;
+
+        // Symptoms
+        if (info.symptoms && Array.isArray(info.symptoms)) {
+          const symptomsHtml = info.symptoms
+            .map(
+              (symptom) => `
+            <div class="flex items-start">
+              <i class="fas fa-circle text-red-400 text-xs mt-2 mr-3 flex-shrink-0"></i>
+              <p class="text-gray-700">${symptom}</p>
+            </div>
+          `
+            )
+            .join("");
+          document.getElementById("diseaseSymptoms").innerHTML = symptomsHtml;
+        } else {
+          document.getElementById("diseaseSymptoms").innerHTML = `
+            <p class="text-gray-700">${info.symptoms || "Informasi gejala tidak tersedia"}</p>
+          `;
+        }
+
+        // Causes
+        if (info.causes && Array.isArray(info.causes)) {
+          const causesHtml = info.causes
+            .map(
+              (cause) => `
+            <div class="flex items-start">
+              <i class="fas fa-arrow-right text-orange-400 text-sm mt-1 mr-3 flex-shrink-0"></i>
+              <p class="text-gray-700">${cause}</p>
+            </div>
+          `
+            )
+            .join("");
+          document.getElementById("diseaseCauses").innerHTML = causesHtml;
+        } else {
+          document.getElementById("diseaseCauses").innerHTML = `
+            <p class="text-gray-700">Informasi penyebab tidak tersedia</p>
+          `;
+        }
+
+        // Prevention
+        if (info.prevention && Array.isArray(info.prevention)) {
+          const preventionHtml = info.prevention
+            .map(
+              (prevent) => `
+            <div class="flex items-start">
+              <i class="fas fa-check-circle text-green-500 text-sm mt-1 mr-3 flex-shrink-0"></i>
+              <p class="text-gray-700">${prevent}</p>
+            </div>
+          `
+            )
+            .join("");
+          document.getElementById("diseasePrevention").innerHTML = preventionHtml;
+        } else {
+          document.getElementById("diseasePrevention").innerHTML = `
+            <p class="text-gray-700">${info.prevention || "Informasi pencegahan tidak tersedia"}</p>
+          `;
+        }
+
+        // Treatment
+        if (info.treatment && Array.isArray(info.treatment)) {
+          const treatmentHtml = info.treatment
+            .map(
+              (treat) => `
+            <div class="flex items-start">
+              <i class="fas fa-plus-circle text-blue-500 text-sm mt-1 mr-3 flex-shrink-0"></i>
+              <p class="text-gray-700">${treat}</p>
+            </div>
+          `
+            )
+            .join("");
+          document.getElementById("diseaseTreatment").innerHTML = treatmentHtml;
+        } else {
+          document.getElementById("diseaseTreatment").innerHTML = `
+            <p class="text-gray-700">${info.treatment || "Informasi pengobatan tidak tersedia"}</p>
+          `;
+        }
+
+        // Impact
+        document.getElementById("diseaseImpact").innerHTML = `
+          <div class="flex items-start">
+            <i class="fas fa-exclamation-circle text-purple-500 text-lg mt-1 mr-3 flex-shrink-0"></i>
+            <p class="text-gray-700 font-semibold">${info.impact || "Informasi dampak tidak tersedia"}</p>
+          </div>
+        `;
+
+        // Schedule
+        if (info.prevention_schedule || info.maintenance_schedule) {
+          const schedule = info.prevention_schedule || info.maintenance_schedule;
+          const scheduleHtml = Object.entries(schedule)
+            .map(
+              ([period, activity]) => `
+            <div class="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
+              <div class="flex items-center mb-2">
+                <i class="fas fa-clock text-teal-500 mr-2"></i>
+                <span class="font-semibold text-gray-800">${period}</span>
+              </div>
+              <p class="text-gray-700 text-sm">${activity}</p>
+            </div>
+          `
+            )
+            .join("");
+          document.getElementById("diseaseSchedule").innerHTML = scheduleHtml;
+        } else {
+          document.getElementById("diseaseSchedule").innerHTML = `
+            <p class="text-gray-700">Jadwal pengendalian tidak tersedia</p>
+          `;
+        }
+
+        // Handle healthy plants special display
+        if (prediction.toLowerCase().includes("healthy")) {
+          document.getElementById("healthyConditions").classList.remove("hidden");
+
+          // Maintenance
+          if (info.maintenance && Array.isArray(info.maintenance)) {
+            const maintenanceHtml = info.maintenance
+              .map(
+                (maintain) => `
+              <div class="flex items-start">
+                <i class="fas fa-leaf text-emerald-500 text-sm mt-1 mr-3 flex-shrink-0"></i>
+                <p class="text-gray-700">${maintain}</p>
+              </div>
+            `
+              )
+              .join("");
+            document.getElementById("healthyMaintenance").innerHTML = maintenanceHtml;
+          }
+
+          // Optimal conditions
+          if (info.optimal_conditions && Array.isArray(info.optimal_conditions)) {
+            const conditionsHtml = info.optimal_conditions
+              .map(
+                (condition) => `
+              <div class="flex items-start">
+                <i class="fas fa-thermometer-half text-sky-500 text-sm mt-1 mr-3 flex-shrink-0"></i>
+                <p class="text-gray-700">${condition}</p>
+              </div>
+            `
+              )
+              .join("");
+            document.getElementById("healthyConditionsDetail").innerHTML = conditionsHtml;
+          }
+        } else {
+          document.getElementById("healthyConditions").classList.add("hidden");
+        }
+
+        // Action Tips based on severity
+        let actionTips = "";
+        switch (severity) {
+          case "Sangat Tinggi":
+            actionTips = `
+              <div class="bg-red-100 border border-red-300 rounded-lg p-4 mb-3">
+                <h6 class="font-bold text-red-800 mb-2"><i class="fas fa-exclamation-triangle mr-2"></i>TINDAKAN DARURAT!</h6>
+                <p class="text-red-700">Segera isolasi tanaman yang terinfeksi dan lakukan pengobatan intensif. Pantau penyebaran ke tanaman lain setiap hari.</p>
+              </div>
+              <ul class="space-y-2 text-gray-700">
+                <li><i class="fas fa-clock mr-2 text-red-500"></i>Tindakan dalam 24 jam pertama sangat kritis</li>
+                <li><i class="fas fa-eye mr-2 text-orange-500"></i>Monitor tanaman sekitar setiap hari</li>
+                <li><i class="fas fa-phone mr-2 text-blue-500"></i>Konsultasi dengan ahli pertanian segera</li>
+              </ul>
+            `;
+            break;
+          case "Tinggi":
+            actionTips = `
+              <div class="bg-orange-100 border border-orange-300 rounded-lg p-4 mb-3">
+                <h6 class="font-bold text-orange-800 mb-2"><i class="fas fa-exclamation-circle mr-2"></i>PERLU TINDAKAN CEPAT</h6>
+                <p class="text-orange-700">Lakukan pengobatan sesuai rekomendasi dan tingkatkan monitoring. Cegah penyebaran dengan isolasi tanaman.</p>
+              </div>
+              <ul class="space-y-2 text-gray-700">
+                <li><i class="fas fa-calendar mr-2 text-orange-500"></i>Tindakan dalam 2-3 hari ke depan</li>
+                <li><i class="fas fa-spray-can mr-2 text-green-500"></i>Aplikasi treatment sesuai jadwal</li>
+                <li><i class="fas fa-chart-line mr-2 text-blue-500"></i>Dokumentasi perkembangan penyakit</li>
+              </ul>
+            `;
+            break;
+          case "Sedang":
+            actionTips = `
+              <div class="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-3">
+                <h6 class="font-bold text-yellow-800 mb-2"><i class="fas fa-info-circle mr-2"></i>MONITOR & TREATMENT</h6>
+                <p class="text-yellow-700">Lakukan pengobatan pencegahan dan tingkatkan perawatan rutin. Monitor perkembangan secara berkala.</p>
+              </div>
+              <ul class="space-y-2 text-gray-700">
+                <li><i class="fas fa-eye mr-2 text-yellow-500"></i>Monitor setiap 3-5 hari</li>
+                <li><i class="fas fa-leaf mr-2 text-green-500"></i>Tingkatkan perawatan rutin</li>
+                <li><i class="fas fa-shield-alt mr-2 text-blue-500"></i>Fokus pada pencegahan</li>
+              </ul>
+            `;
+            break;
+          default:
+            actionTips = `
+              <div class="bg-green-100 border border-green-300 rounded-lg p-4 mb-3">
+                <h6 class="font-bold text-green-800 mb-2"><i class="fas fa-check-circle mr-2"></i>PERTAHANKAN KONDISI OPTIMAL</h6>
+                <p class="text-green-700">Tanaman dalam kondisi sehat. Lanjutkan perawatan rutin dan monitoring berkala untuk menjaga kesehatan tanaman.</p>
+              </div>
+              <ul class="space-y-2 text-gray-700">
+                <li><i class="fas fa-heart mr-2 text-green-500"></i>Lanjutkan perawatan rutin</li>
+                <li><i class="fas fa-calendar-check mr-2 text-blue-500"></i>Monitor mingguan sudah cukup</li>
+                <li><i class="fas fa-seedling mr-2 text-green-500"></i>Optimalisasi pertumbuhan</li>
+              </ul>
+            `;
+        }
+        document.getElementById("actionTips").innerHTML = actionTips;
+        } // End of disease information processing for valid tomato leaves
+
+        // Show results with animation
+        document.getElementById("resultsDiv").classList.remove("hidden");
+        document.getElementById("resultsDiv").classList.add("animate-fade-in");
+
+        // Scroll to results
+        setTimeout(() => {
+          document.getElementById("resultsDiv").scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      }
+
+      function getSeverityColor(severity) {
+        switch (severity) {
+          case "Sangat Tinggi":
+            return "red";
+          case "Tinggi":
+            return "orange";
+          case "Sedang":
+            return "yellow";
+          case "Tidak ada":
+            return "green";
+          case "Tidak Valid":
+            return "red";
+          default:
+            return "gray";
+        }
+      }
+
+      function getSeverityIcon(severity) {
+        switch (severity) {
+          case "Sangat Tinggi":
+            return "exclamation-triangle";
+          case "Tinggi":
+            return "exclamation-circle";
+          case "Sedang":
+            return "exclamation";
+          case "Tidak ada":
+            return "check-circle";
+          case "Tidak Valid":
+            return "times-circle";
+          default:
+            return "question-circle";
+        }
+      }
+
+      function showNotification(message, type) {
+        const notification = document.createElement("div");
+        notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 animate-slide-up ${type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`;
+        notification.innerHTML = `
+          <div class="flex items-center">
+            <i class="fas fa-${type === "success" ? "check" : "times"} mr-2"></i>
+            ${message}
+          </div>
+        `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 5000);
+      }
+
+      // Download report
+      document.getElementById("downloadBtn").addEventListener("click", function () {
+        if (currentFilename) {
+          window.open(`/download_report/${currentFilename}`, "_blank");
+          showNotification("Laporan sedang diunduh...", "success");
+        } else {
+          showNotification("Silakan analisis gambar terlebih dahulu!", "error");
+        }
+      });
+
+      // Drag and drop functionality with enhanced visual feedback
+      const uploadArea = document.getElementById("uploadArea").parentElement;
+
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, highlight, false);
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+      });
+
+      uploadArea.addEventListener("drop", handleDrop, false);
+
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      function highlight(e) {
+        uploadArea.classList.add("border-emerald-500", "bg-emerald-50", "scale-105");
+        uploadArea.classList.remove("border-gray-300");
+      }
+
+      function unhighlight(e) {
+        uploadArea.classList.remove("border-emerald-500", "bg-emerald-50", "scale-105");
+        uploadArea.classList.add("border-gray-300");
+      }
+
+      function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+
+        if (files.length > 0) {
+          document.getElementById("imageInput").files = files;
+          const event = new Event("change", { bubbles: true });
+          document.getElementById("imageInput").dispatchEvent(event);
+          showNotification("Gambar berhasil dipilih!", "success");
+        }
+      }
+    </script>
+  </body>
+</html>
